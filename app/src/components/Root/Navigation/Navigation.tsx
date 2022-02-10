@@ -11,11 +11,22 @@ const Wrapper = styled.div`
   margin-bottom: 48px;
 `;
 
-const Navigation = () => {
+export interface NavigationProps {
+  selectedBrokerAppointment:
+    | {
+        name: string;
+        date: string;
+      }
+    | undefined;
+}
+
+const Navigation = ({ selectedBrokerAppointment }: NavigationProps) => {
   return (
     <Wrapper>
       <strong>
-        Currently selected appointment: [appointment date] with [broker name]
+        {selectedBrokerAppointment
+          ? `Currently selected appointment: ${selectedBrokerAppointment.date} with ${selectedBrokerAppointment.name}`
+          : "Please select an appointment"}
       </strong>
       <strong>Welcome to Lendi</strong>
     </Wrapper>

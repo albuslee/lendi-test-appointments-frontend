@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import Broker from "./Broker";
@@ -16,34 +17,92 @@ const Heading = styled.strong.attrs({ role: "heading", level: 2 })`
   font-size: 20px;
 `;
 
-type BrokerAppointments = {
+interface BrokerAppointment {
   id: number;
   name: string;
   appointments: { id: number; brokerId: number; date: string }[];
-}[];
+}
 
-const AppointmentSelect = () => {
-  axios
-    .get("http://localhost:8080/brokers")
-    .then(({ data }) => console.log(data));
-  axios
-    .get("http://localhost:8080/appointments")
-    .then(({ data }) => console.log(data));
+type Broker = Pick<BrokerAppointment, "id" | "name">;
+
+type Appointment = {
+  id: number;
+  brokerId: number;
+  date: string;
+};
+export interface AppointmentSelectProps {
+  setSelectedBrokerAppointment: Function;
+}
+
+const AppointmentSelect = ({
+  setSelectedBrokerAppointment,
+}: AppointmentSelectProps) => {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<number>();
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment>();
+  const [brokerAppointments, setBrokerAppointments] = useState<
+    BrokerAppointment[]
+  >([]);
+
+  // use two useEffect here to make sure appointments are loaded first,
+  // or we can use await to get both appointments and brokers within one useEffect
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/appointments")
+      .then(({ data }) => setAppointments(data));
+  }, []);
+  useEffect(() => {
+    axios.get("http://localhost:8080/brokers").then(({ data }) => {
+      const updatedData = data.map((broker: Broker) => ({
+        ...broker,
+        appointments: appointments.filter(
+          (appt) => appt.brokerId === broker.id
+        ),
+      }));
+      setBrokerAppointments(updatedData);
+    });
+  }, [appointments]);
+
+  // update selectedAppointment when selectedAppointmentId is updated by clicking appointment
+  useEffect(() => {
+    const appointment = appointments.find(
+      (appt: Appointment) => appt.id === selectedAppointmentId
+    );
+    setSelectedAppointment(appointment);
+    if (selectedAppointmentId) {
+      setSelectedBrokerAppointment({
+        name: brokerAppointments.find(
+          (broker) => broker.id === appointment?.brokerId
+        )?.name,
+        date: appointment?.date,
+      });
+    }
+  }, [selectedAppointmentId]);
 
   return (
     <Wrapper>
       <SideBar>
         <Heading>Amazing site</Heading>
-        TODO: populate brokers
         <ul>
-          {/* {brokerAppointments.map((broker) => (
-            <Broker key={broker.id} broker={broker} />
-          ))} */}
+          {brokerAppointments.map((broker: BrokerAppointment) => (
+            <Broker
+              key={broker.id}
+              broker={broker}
+              setSelectedAppointmentId={setSelectedAppointmentId}
+            />
+          ))}
         </ul>
       </SideBar>
       <div>
         <Heading>Appointment details</Heading>
-        TODO: get appointment details when clicking on one from the left side
+        {selectedAppointment ? (
+          <>
+            <div>BrokerId: {selectedAppointment?.brokerId}</div>
+            <div>Date: {selectedAppointment?.date}</div>
+          </>
+        ) : (
+          <div>No appointments are selected</div>
+        )}
       </div>
     </Wrapper>
   );

@@ -1,7 +1,6 @@
 ## Info
 
-./services is the backend API
-./app is a frontend app
+./services is the backend API ./app is a frontend app
 
 ## How to run this
 
@@ -13,10 +12,9 @@ Then you want to start the app
 
 cd ./app && yarn && yarn start
 
-
 ## The test
 
-You'll start with the app not showing any data 
+You'll start with the app not showing any data
 
 ### Task 1: Populate the site with brokers and appointments
 
@@ -27,3 +25,7 @@ You'll start with the app not showing any data
 ### Task 4: Show appointment details on top navigation when clicking on an appointment
 
 ### Optional task: complete unit test in ./app/src/components/AppointmentSelect/Broker
+
+## Run unit test
+
+`cd ./app && yarn test`

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import Navigation from "./Navigation";
@@ -26,13 +26,23 @@ const Heading = styled.strong.attrs({ role: "heading", level: 1 })`
   margin-top: 20px;
 `;
 
+type selectedBrokerAppointment = {
+  name: string;
+  date: string;
+};
+
 const Root = () => {
+  const [selectedBrokerAppointment, setSelectedBrokerAppointment] = useState<
+    selectedBrokerAppointment | undefined
+  >();
   return (
     <Wrapper>
-      <Navigation />
+      <Navigation selectedBrokerAppointment={selectedBrokerAppointment} />
       <Content>
         <Heading>Amazing site</Heading>
-        <AppointmentSelect />
+        <AppointmentSelect
+          setSelectedBrokerAppointment={setSelectedBrokerAppointment}
+        />
       </Content>
     </Wrapper>
   );
